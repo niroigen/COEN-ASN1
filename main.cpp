@@ -46,29 +46,38 @@ int ReadFile(const std::string& file) {
     // The first line of the file will be used to store the number of bulbs there are
     bool is_first_line = true;
 
-    if (myfile.is_open())
+    try
     {
-        int line_num = 0;
-        while (getline(myfile, line))
+        if (myfile.is_open())
         {
-            if (is_first_line)
+            int line_num = 0;
+            while (getline(myfile, line))
             {
-                // If it is the first line then extract the number of light bulbs that will be used
-                size = std::stoi(line);
+                if (is_first_line)
+                {
+                    // If it is the first line then extract the number of light bulbs that will be used
+                    size = std::stoi(line);
 
-                // Creating an array of the size provided in line 1 of the file
-                lightBulbs = new int[size];
-                is_first_line = false;
-            } else {
-                // Storing the state of each of the light bulbs
-                lightBulbs[line_num++] = std::stoi(line);
+                    // Creating an array of the size provided in line 1 of the file
+                    lightBulbs = new int[size];
+                    is_first_line = false;
+                } else {
+                    // Storing the state of each of the light bulbs
+                    lightBulbs[line_num++] = std::stoi(line);
+                }
             }
         }
-        myfile.close();
+
+            // If the file is not readable then output a message
+        else std::cout << UNABLE_TO_OPEN_FILE;
+    }
+    catch(const std::invalid_argument& ia)
+    {
+        std::cerr << "Invalid argument: " << ia.what() << std::endl;
+        std::cerr << "File not in proper format" << std::endl;
     }
 
-    // If the file is not readable then output a message
-    else std::cout << UNABLE_TO_OPEN_FILE;
+    myfile.close();
 
     return size;
 }
