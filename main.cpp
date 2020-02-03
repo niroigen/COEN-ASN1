@@ -7,8 +7,8 @@ int FindPivot(int left, int right);
 void FindDefective(int * arr, int left, int right);
 bool IsDefectiveSubarray(const int * arr, int start, int end);
 int ReadFile(const std::string& file);
-int num_threads = 0;
-int * light_bulbs;
+int numThreads = 0;
+int * lightBulbs;
 
 const std::string INPUT_FILE = "Input.txt";
 const std::string NUMBER_OF_THREADS_USED = "The number of threads for this problem was : ";
@@ -20,10 +20,10 @@ int main()
     int start = 0;
     int size = ReadFile(INPUT_FILE);
 
-    std::thread findDefectiveThread(FindDefective, light_bulbs, start, size - 1);
+    std::thread findDefectiveThread(FindDefective, lightBulbs, start, size - 1);
     findDefectiveThread.join();
 
-    std::cout << NUMBER_OF_THREADS_USED << num_threads << std::endl;
+    std::cout << NUMBER_OF_THREADS_USED << numThreads << std::endl;
 
     return 0;
 }
@@ -57,11 +57,11 @@ int ReadFile(const std::string& file) {
                 size = std::stoi(line);
 
                 // Creating an array of the size provided in line 1 of the file
-                light_bulbs = new int[size];
+                lightBulbs = new int[size];
                 is_first_line = false;
             } else {
                 // Storing the state of each of the light bulbs
-                light_bulbs[line_num++] = std::stoi(line);
+                lightBulbs[line_num++] = std::stoi(line);
             }
         }
         myfile.close();
@@ -78,7 +78,7 @@ int ReadFile(const std::string& file) {
  */
 void FindDefective(int * arr, int left, int right) {
     // Keeping track of the number of the thread
-    num_threads++;
+    numThreads++;
 
     // If the there is just one element in the subarray, then check whether it is defected o
     if (left == right) {
