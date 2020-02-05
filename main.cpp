@@ -14,16 +14,24 @@ const std::string INPUT_FILE = "Input.txt";
 const std::string NUMBER_OF_THREADS_USED = "The number of threads for this problem was : ";
 const std::string UNABLE_TO_OPEN_FILE = "Unable to open file";
 const std::string DEFECTIVE_LIGHT_BULB =  "Defective bulb at position ";
+const std::string ENTER_RIGHT_AMOUNT_OF_LIGHT_BULBS = "Please enter right amount of light bulbs";
 
 int main()
 {
     int start = 0;
     int size = ReadFile(INPUT_FILE);
 
+    auto startTime = std::chrono::high_resolution_clock::now();
+
     std::thread findDefectiveThread(FindDefective, lightBulbs, start, size - 1);
     findDefectiveThread.join();
 
+    auto finish = std::chrono::high_resolution_clock::now();
+
+    std::chrono::duration<double> elapsed = finish - startTime;
+
     std::cout << NUMBER_OF_THREADS_USED << numThreads << std::endl;
+    std::cout << "Process has taken " << elapsed.count() << std::endl;
 
     return 0;
 }
@@ -61,10 +69,26 @@ int ReadFile(const std::string& file) {
                     // Creating an array of the size provided in line 1 of the file
                     lightBulbs = new int[size];
                     isFirstLine = false;
+                } else if (line_num >= size) {
+                    std::cerr << "Expected " << size << " light bulbs, but received too many." << std::endl;
+                    std::cerr << ENTER_RIGHT_AMOUNT_OF_LIGHT_BULBS << std::endl;
+                    exit(0);
                 } else {
                     // Storing the state of each of the light bulbs
+                    int val =  std::stoi(line);
+
+                    if (val != 0 && val != 1) {
+                        throw std::invalid_argument("Bulb state can only be 0 or 1");
+                    }
+
                     lightBulbs[line_num++] = std::stoi(line);
                 }
+            }
+
+            if (line_num != size) {
+                std::cerr << "Expected " << size << " light bulbs, but received only " << line_num << std::endl;
+                std::cerr << ENTER_RIGHT_AMOUNT_OF_LIGHT_BULBS << std::endl;
+                exit(0);
             }
         }
 
@@ -75,6 +99,7 @@ int ReadFile(const std::string& file) {
     {
         std::cerr << "Invalid argument: " << ia.what() << std::endl;
         std::cerr << "File not in proper format" << std::endl;
+        exit(0);
     }
 
     inputFile.close();
