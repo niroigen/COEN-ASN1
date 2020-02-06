@@ -4,8 +4,8 @@
 #include <string>
 
 int FindPivot(int left, int right);
-void FindDefective(int * arr, int left, int right);
-bool IsDefectiveSubarray(const int * arr, int start, int end);
+void FindDefective(int left, int right);
+bool IsDefectiveSubarray(int start, int end);
 int ReadFile(const std::string& file);
 int numThreads = 0;
 int * lightBulbs;
@@ -23,7 +23,7 @@ int main()
 
     auto startTime = std::chrono::high_resolution_clock::now();
 
-    std::thread findDefectiveThread(FindDefective, lightBulbs, start, size - 1);
+    std::thread findDefectiveThread(FindDefective, start, size - 1);
     findDefectiveThread.join();
 
     auto finish = std::chrono::high_resolution_clock::now();
@@ -110,32 +110,33 @@ int ReadFile(const std::string& file) {
 /*
  * Using recursion to see whether a given array has a defective light bulb or not
  */
-void FindDefective(int * arr, int left, int right) {
+void FindDefective(int left, int right) {
     // Keeping track of the number of the thread
     numThreads++;
 
     // If the there is just one element in the subarray, then check whether it is defected o
     if (left == right) {
-        if (arr[left] == 0) {
+        if (lightBulbs[left] == 0) {
             std::cout << DEFECTIVE_LIGHT_BULB << left + 1 << std::endl;
             return;
         }
     }
 
     // If a subarray isn't defective then there is nothing to do
-    if (!IsDefectiveSubarray(arr, left, right)) return;
+    if (!IsDefectiveSubarray(left, right)) return;
 
     // Getting the pivot point
     int pivot = FindPivot(left, right);
 
     // Starting a thread which will attempt to find a defective light bulb on the left
     // side of the light bulb array
-    std::thread left_thread(FindDefective, arr, left, pivot - 1);
-    left_thread.join();
+    std::thread left_thread(FindDefective, left, pivot - 1);
 
     // Starting a thread which will attempt to find a defective light bulb on the right
     // side of the light bulb array
-    std::thread right_thread(FindDefective, arr, pivot, right);
+    std::thread right_thread(FindDefective, pivot, right);
+
+    left_thread.join();
     right_thread.join();
 }
 
@@ -143,10 +144,10 @@ void FindDefective(int * arr, int left, int right) {
  * Will verify whether the array provided
  * contains at least one defective bulb
  */
-bool IsDefectiveSubarray(const int * arr, int start, int end)
+bool IsDefectiveSubarray(int start, int end)
 {
     for (int i = start; i <= end; i++)
-        if (arr[i] == 0) return true;
+        if (lightBulbs[i] == 0) return true;
 
     return false;
 }
